@@ -1,0 +1,8 @@
+   name: javascript-mode
+ source: git:https://github.com/scaled/javascript-mode.git
+version: 1.0
+descrip: Provides language support for Javascript.
+ weburl: https://github.com/scaled/javascript-mode
+license: New BSD
+ scopts: -deprecation -feature
+ depend: git:https://github.com/scaled/textmate-grammar.git

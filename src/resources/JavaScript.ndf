@@ -1,0 +1,227 @@
+name: JavaScript
+scopeName: source.js
+repository:
+ function-params:
+  multi:
+   begin: (?=[\p{L}\p{Nl}$_])
+   end: (?=[,)])
+   patterns:
+    single:
+     name: variable.parameter.function.js
+     pattern: \G[\p{L}\p{Nl}$_][\p{L}\p{Nl}$\p{Mn}\p{Mc}\p{Nd}\p{Pc}\x{200C}\x{200D}]*
+patterns:
+ single:
+  name: comment.line.number-sign.shebang.js
+  pattern: \A(#!).*$\n
+  caps: 1=punctuation.definition.comment.js
+ multi:
+  name: meta.function.js
+  begin: (?x)\
+   (?:\
+    (?<!\w)                  # Ensure word boundry\
+    ([\p{L}\p{Nl}$_][\p{L}\p{Nl}$\p{Mn}\p{Mc}\p{Nd}\p{Pc}\x{200C}\x{200D}]*) # Identifier\
+    \s*(=)\s*\
+   )?                    # Optional\
+   \b(function)\
+   (?:\s*\
+    (\*)                  # Optional generator notation\
+   )?                    # (ECMAScript 6)\
+   (?:\s*\
+    (?<=[\s\*])\
+    ([\p{L}\p{Nl}$_][\p{L}\p{Nl}$\p{Mn}\p{Mc}\p{Nd}\p{Pc}\x{200C}\x{200D}]*) # Optional Name\
+   )?\
+   \s*(\()
+  bcaps: 1=meta.function.variable.js 2=keyword.operator.js 3=storage.type.function.js 4=storage.modifier.js 5=entity.name.function.js 6=punctuation.definition.parameters.begin.js
+  end: (\))
+  ecaps: 1=punctuation.definition.parameters.end.js
+  patterns:
+   include: #function-params
+ single:
+  name: constant.numeric.hex.js
+  pattern: \b0[xX]\h+\b
+ single:
+  name: constant.numeric.js
+  pattern: (?x)\
+    (?<!\w)         # Ensure word boundry\
+    (?>\
+     (\
+      (0|[1-9][0-9]*)(\.[0-9]*)?  # 0 or 1 or 1. or 1.0\
+       | \.[0-9]+      # .1\
+     )\
+     ([eE][+-]?[0-9]+)?     # Exponent\
+    )\
+    (?!\w)         # Ensure word boundry
+ multi:
+  name: string.quoted.single.js
+  begin: '
+  bcaps: 0=punctuation.definition.string.begin.js
+  end: '
+  ecaps: 0=punctuation.definition.string.end.js
+  patterns:
+   single:
+    name: constant.character.escape.js
+    pattern: \\(x\h{2}|[0-2][0-7]{0,2}|3[0-6][0-7]?|37[0-7]?|[4-7][0-7]?|.)
+ multi:
+  name: string.quoted.double.js
+  begin: "
+  bcaps: 0=punctuation.definition.string.begin.js
+  end: "
+  ecaps: 0=punctuation.definition.string.end.js
+  patterns:
+   single:
+    name: constant.character.escape.js
+    pattern: \\(x\h{2}|[0-2][0-7]{0,2}|3[0-6][0-7]|37[0-7]?|[4-7][0-7]?|.)
+ multi:
+  name: comment.block.js
+  begin: /\*
+  bcaps: 0=punctuation.definition.comment.js
+  end: \*/
+  ecaps: 0=punctuation.definition.comment.js
+ multi:
+  begin: (^[ \t]+)?(?=//)
+  bcaps: 1=punctuation.whitespace.comment.leading.js
+  end: (?!\G)
+  patterns:
+   multi:
+    name: comment.line.double-slash.js
+    begin: //
+    bcaps: 0=punctuation.definition.comment.js
+    end: \n
+ single:
+  name: storage.type.js
+  pattern: (?<!\.|\$)\b(let|var)\b(?!\$)
+ single:
+  name: storage.modifier.js
+  pattern: (?<!\.|\$)\b(get|set)\b(?!\$)
+ single:
+  name: keyword.control.js
+  pattern: (?<!\.|\$)\b(break|case|catch|continue|default|do|else|finally|for|if|return|switch|throw|try|while|yield)\b(?!\$)
+ single:
+  name: keyword.operator.js
+  pattern: (?<!\.|\$)\b(delete|in|instanceof|new|typeof|void|with)\b(?!\$)
+ single:
+  name: keyword.operator.js
+  pattern: !|%|&|\*|\-\-|\-|\+\+|\+|~|===|==|=|!=|!==|<=|>=|<<=|>>=|>>>=|<>|<|>|!|&&|\|\||\?\:|\*=|(?<!\()/=|%=|\+=|\-=|&=|\^=
+ single:
+  name: keyword.other.js
+  pattern: (?<!\.|\$)\b(debugger)\b(?!\$)
+ single:
+  name: support.class.js
+  pattern: (?<!\.|\$)\b(Array|Boolean|Date|Error|EvalError|Function|Number|Object|RangeError|ReferenceError|RegExp|String|SyntaxError|TypeError|URIError)\b(?!\$)
+ single:
+  name: support.class.dom.js
+  pattern: (?<!\.|\$)\b(Attr|CharacterData|Comment|CompositionEvent|CustomEvent|Document|DocumentFragment|DocumentType|DOMError|DOMException|DOMImplementation|DOMParser|DOMString|DOMTimestamp|DOMSettableTokenList|DOMStringList|DOMTokenList|Element|Event|EventTarget|FocusEvent|HTMLCollection|KeyboardEvent|MouseEvent|MutationObserver|MutationRecord|Node|NodeFilter|NodeIterator|NodeList|ProcessingInstruction|Range|Text|TextEvent|TreeWalker|UIEvent|WheelEvent|XMLDocument)\b(?!\$)
+ single:
+  name: invalid.deprecated.dom.js
+  pattern: (?<!\.|\$)\b(CDATASection|DOMConfiguration|DOMErrorHandler|DOMImplementationList|DOMImplementationSource|DOMLocator|DOMObject|DOMUserData|Entity|EntityReference|MutationEvent|NamedNodeMap|NameList|Notation|TypeInfo|UserDataHandler)\b(?!\$)
+ single:
+  name: support.class.dom.js
+  pattern: (?<!\.|\$)\b(ArrayBuffer|DataView|Float32Array|Float64Array|Int8Array|Int16Array|Int32Array|TypedArray|Uint8Array|Uint16Array|Uint32Array|Uint8ClampedArray)\b(?!\$)
+ single:
+  name: support.class.dom.js
+  pattern: (?<!\.|\$)\b(Blob|File|FileList|FileReader)\b(?!\$)
+ single:
+  name: support.class.dom.js
+  pattern: (?<!\.|\$)\b(FormData|ProgressEvent|XMLHttpRequest|XMLHttpRequestUpload)\b(?!\$)
+ single:
+  name: support.class.dom.js
+  pattern: (?<!\.|\$)\b(EventSource)\b(?!\$)
+ single:
+  name: support.class.dom.js
+  pattern: (?<!\.|\$)\b(CSS|CSSCharsetRule|CSSImportRule|CSSPageRule|CSSRule|CSSRuleList|CSSStyleDeclaration|CSSStyleRule|CSSStyleSheet|MediaList|Stylesheet|StyleSheetList)\b(?!\$)
+ single:
+  name: support.class.dom.js
+  pattern: (?<!\.|\$)\b(Screen)\b(?!\$)
+ single:
+  name: support.class.dom.js
+  pattern: (?<!\.|\$)\b(CSSFontFaceRule)\b(?!\$)
+ single:
+  name: support.class.dom.js
+  pattern: (?<!\.|\$)\b(SVGAElement|SVGAltGlyphDefElement|SVGAltGlyphElement|SVGAltGlyphItemElement|SVGAngle|SVGAnimateColorElement|SVGAnimateElement|SVGAnimateMotionElement|SVGAnimateTransformElement|SVGAnimatedAngle|SVGAnimatedBoolean|SVGAnimatedEnumeration|SVGAnimatedInteger|SVGAnimatedLength|SVGAnimatedLengthList|SVGAnimatedNumber|SVGAnimatedNumberList|SVGAnimatedPreserveAspectRatio|SVGAnimatedRect|SVGAnimatedString|SVGAnimatedTransformList|SVGAnimationElement|SVGCircleElement|SVGClipPathElement|SVGColor|SVGComponentTransferFunctionElement|SVGCursorElement|SVGDefsElement|SVGDescElement|SVGDocument|SVGElement|SVGElementInstance|SVGElementInstanceList|SVGEllipseElement|SVGFEBlendElement|SVGFEColorMatrixElement|SVGFEComponentTransferElement|SVGFECompositeElement|SVGFEConvolveMatrixElement|SVGFEDiffuseLightingElement|SVGFEDisplacementMapElement|SVGFEDistantLightElement|SVGFEFloodElement|SVGFEFuncAElement|SVGFEFuncBElement|SVGFEFuncGElement|SVGFEFuncRElement|SVGFEGaussianBlurElement|SVGFEImageElement|SVGFEMergeElement|SVGFEMergeNodeElement|SVGFEMorphologyElement|SVGFEOffsetElement|SVGFEPointLightElement|SVGFESpecularLightingElement|SVGFESpotLightElement|SVGFETileElement|SVGFETurbulenceElement|SVGFilterElement|SVGFontElement|SVGFontFaceElement|SVGFontFaceFormatElement|SVGFontFaceNameElement|SVGFontFaceSrcElement|SVGFontFaceUriElement|SVGForeignObjectElement|SVGGElement|SVGGlyphElement|SVGGlyphRefElement|SVGGradientElement|SVGHKernElement|SVGImageElement|SVGLength|SVGLengthList|SVGLineElement|SVGLinearGradientElement|SVGMPathElement|SVGMarkerElement|SVGMaskElement|SVGMatrix|SVGMetadataElement|SVGMissingGlyphElement|SVGNumber|SVGNumberList|SVGPaint|SVGPathElement|SVGPathSeg|SVGPathSegArcAbs|SVGPathSegArcRel|SVGPathSegClosePath|SVGPathSegCurvetoCubicAbs|SVGPathSegCurvetoCubicRel|SVGPathSegCurvetoCubicSmoothAbs|SVGPathSegCurvetoCubicSmoothRel|SVGPathSegCurvetoQuadraticAbs|SVGPathSegCurvetoQuadraticRel|SVGPathSegCurvetoQuadraticSmoothAbs|SVGPathSegCurvetoQuadraticSmoothRel|SVGPathSegLinetoAbs|SVGPathSegLinetoHorizontalAbs|SVGPathSegLinetoHorizontalRel|SVGPathSegLinetoRel|SVGPathSegLinetoVerticalAbs|SVGPathSegLinetoVerticalRel|SVGPathSegList|SVGPathSegMovetoAbs|SVGPathSegMovetoRel|SVGPatternElement|SVGPoint|SVGPointList|SVGPolygonElement|SVGPolylineElement|SVGPreserveAspectRatio|SVGRadialGradientElement|SVGRect|SVGRectElement|SVGRenderingIntent|SVGSVGElement|SVGScriptElement|SVGSetElement|SVGStopElement|SVGStringList|SVGStyleElement|SVGSwitchElement|SVGSymbolElement|SVGTRefElement|SVGTSpanElement|SVGTextContentElement|SVGTextElement|SVGTextPathElement|SVGTextPositioningElement|SVGTitleElement|SVGTransform|SVGTransformList|SVGUnitTypes|SVGUseElement|SVGUseElement|SVGVKernElement|SVGViewElement|SVGViewSpec|SVGZoomEvent)\b(?!\$)
+ single:
+  name: support.class.dom.js
+  pattern: (?<!\.|\$)\b(WebGLActiveInfo|WebGLBuffer|WebGLContextEvent|WebGLFramebuffer|WebGLProgram|WebGLRenderbuffer|WebGLRenderingContext|WebGLShader|WebGLShaderPrecisionFormat|WebGLTexture|WebGLUniformLocation)\b(?!\$)
+ single:
+  name: support.class.dom.js
+  pattern: (?<!\.|\$)\b(Audio|BarProp|DOMStringMap|ErrorEvent|FileError|HTMLAllCollection|HTMLAnchorElement|HTMLAppletElement|HTMLAreaElement|HTMLAudioElement|HTMLBRElement|HTMLBaseElement|HTMLBodyElement|HTMLButtonElement|HTMLCanvasElement|HTMLDListElement|HTMLDataElement|HTMLDataListElement|HTMLDetailsElement|HTMLDialogElement|HTMLDirectoryElement|HTMLDivElement|HTMLEmbedElement|HTMLFieldSetElement|HTMLFontElement|HTMLFormControlsCollection|HTMLFormElement|HTMLFrameElement|HTMLFrameSetElement|HTMLHRElement|HTMLHeadElement|HTMLHeadingElement|HTMLHtmlElement|HTMLIFrameElement|HTMLImageElement|HTMLInputElement|HTMLKeygenElement|HTMLLIElement|HTMLLabelElement|HTMLLegendElement|HTMLLinkElement|HTMLMapElement|HTMLMarqueeElement|HTMLMediaElement|HTMLMetaElement|HTMLMeterElement|HTMLModElement|HTMLOListElement|HTMLObjectElement|HTMLOptGroupElement|HTMLOptionElement|HTMLOptionsCollection|HTMLOutputElement|HTMLParagraphElement|HTMLParamElement|HTMLPreElement|HTMLProgressElement|HTMLQuoteElement|HTMLScriptElement|HTMLSelectElement|HTMLSour|HTMLSpanElement|HTMLStyleElement|HTMLTableCaptionElement|HTMLTableCellElement|HTMLTableColElement|HTMLTableDataCellElement|HTMLTableElement|HTMLTableHeaderCellElement|HTMLTableRowElement|HTMLTableSectionElement|HTMLTextAreaElement|HTMLTimeElement|HTMLTitleElement|HTMLTrackElement|HTMLUListElement|HTMLUnknownElement|HTMLVideoElement|HashChangeEvent|History|Image|Location|MediaController|MediaError|MouseEvent|Navigator|Option|PageTransitionEvent|PopStateEvent|TextTrack|TextTrackCue|TextTrackCueList|TextTrackList|TimeRanges|TrackEvent|UIEvent|ValidityState|Window)\b(?!\$)
+ single:
+  name: support.constant.dom.js
+  pattern: (?<!\.|\$)\b(applicationCache|closed|console|crypto|document|external|frameElement|frames|history|innerHeight|innerWidth|length|location|locationbar|menubar|name|navigator|offscreenBuffering|onabort|onafterprint|onbeforeprint|onbeforeunload|onblur|oncancel|oncanplay|oncanplaythrough|onchange|onclick|onclose|oncuechange|ondblclick|ondrag|ondragend|ondragenter|ondragexit|ondragleave|ondragover|ondragstart|ondrop|ondurationchange|onemptied|onended|onerror|onfocus|onhashchange|oninput|oninvalid|onkeydown|onkeypress|onkeyup|onload|onloadeddata|onloadedmetadata|onloadstart|onmessage|onmousedown|onmouseenter|onmouseleave|onmousemove|onmouseout|onmouseover|onmouseup|onmousewheel|onoffline|ononline|onpagehide|onpageshow|onpause|onplay|onplaying|onpopstate|onprogress|onratechange|onreset|onresize|onscroll|onseeked|onseeking|onselect|onshow|onstalled|onstorage|onsubmit|onsuspend|ontimeupdate|onunload|onvolumechange|onwaiting|opener|outerHeight|outerWidth|pageXOffset|pageYOffset|parent|personalbar|postMessage|screen|screenX|screenY|scrollbars|scrollX|scrollY|self|status|statusbar|toolbar|top|window)\b(?!\$)
+ single:
+  name: support.function.dom.js
+  pattern: (?<!\.|\$)\b(addEventListener|alert|atob|blur|btoa|clearInterval|clearTimeout|close|confirm|dispatchEvent|doNotTrack|find|focus|getComputedStyle|getMatchedCSSRules|getSelection|matchMedia|moveBy|moveTo|open|openDatabase|print|prompt|removeEventListener|resizeBy|resizeTo|scroll|scrollBy|scrollTo|setInterval|setTimeout|showModalDialog|stop)\b(?!\$)
+ single:
+  name: invalid.deprecated.dom.js
+  pattern: (?<!\.|\$)\b(captureEvents|defaultStatus|defaultstatus|releaseEvents)\b(?!\$)
+ single:
+  name: support.constant.js
+  pattern: (?<!\.|\$)\b(JSON|Math)\b(?!\$)
+ single:
+  name: support.function.js
+  pattern: (?<!\.|\$)\b(decodeURI|decodeURIComponent|encodeURI|encodeURIComponent|eval|isFinite|isNaN|parseFloat|parseInt|uneval)\b(?!\$)
+ single:
+  name: invalid.illegal.js
+  pattern: (?<!\.|\$)\b(class|const|enum|export|extends|import|super)\b(?!\$)
+ single:
+  name: invalid.deprecated.js
+  pattern: (?<!\.|\$)\b(implements|interface|package|private|protected|public|static)\b(?!\$)
+ single:
+  name: constant.language.js
+  pattern: \b(false|Infinity|NaN|null|true|undefined)\b
+ single:
+  name: variable.language.js
+  pattern: (?<!\.|\$)\b(this)\b(?!\$)
+ multi:
+  begin: (?<=[=(:,]|^|return|&&|\|\||!|\?)\s*(?=/[^/*+?])
+  end: (?<=[/igm])
+  patterns:
+   multi:
+    name: string.regexp.js
+    begin: /
+    bcaps: 1=punctuation.definition.string.begin.js
+    end: (/)[igm]*
+    ecaps: 1=punctuation.definition.string.end.js
+    patterns:
+     include: source.js.regexp
+ single:
+  name: punctuation.terminator.statement.js
+  pattern: \;
+ single:
+  pattern: (\{)(\})
+  caps: 1=punctuation.section.scope.begin.js 2=punctuation.section.scope.end.js
+ single:
+  pattern: (\()(\))
+  caps: 1=punctuation.section.scope.begin.js 2=punctuation.section.scope.end.js
+ single:
+  pattern: (\[)(\])
+  caps: 1=punctuation.section.scope.begin.js 2=punctuation.section.scope.end.js
+ single:
+  name: meta.brace.curly.js
+  pattern: \{|\}
+ single:
+  name: meta.brace.round.js
+  pattern: \(|\)
+ single:
+  name: meta.brace.square.js
+  pattern: \[|\]
+ multi:
+  name: meta.ternary-if.js
+  begin: \?
+  end: :
+  patterns:
+   include: $self
+ single:
+  name: support.class.js
+  pattern: (?<=new )([\p{L}\p{Nl}$_][\p{L}\p{Nl}$\p{Mn}\p{Mc}\p{Nd}\p{Pc}\x{200C}\x{200D}]*)(?!\w)
+ single:
+  name: support.class.js
+  pattern: (?<= instanceof )([\p{L}\p{Nl}$_][\p{L}\p{Nl}$\p{Mn}\p{Mc}\p{Nd}\p{Pc}\x{200C}\x{200D}]*)(?!\w)
+ single:
+  name: support.class.js
+  pattern: (?<!\w)([\p{L}\p{Nl}$_][\p{L}\p{Nl}$\p{Mn}\p{Mc}\p{Nd}\p{Pc}\x{200C}\x{200D}]*)(?=\.prototype\b)
+ single:
+  name: keyword.other.js
+  pattern: (?<=\.)(prototype)\b
+ single:
+  name: meta.function-call.js
+  pattern: (?<!\w)([\p{L}\p{Nl}$_][\p{L}\p{Nl}$\p{Mn}\p{Mc}\p{Nd}\p{Pc}\x{200C}\x{200D}]*)(?=\()
