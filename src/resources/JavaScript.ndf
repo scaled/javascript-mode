@@ -77,16 +77,9 @@ patterns:
   bcaps: 0=punctuation.definition.comment.js
   end: \*/
   ecaps: 0=punctuation.definition.comment.js
- multi:
-  begin: (^[ \t]+)?(?=//)
-  bcaps: 1=punctuation.whitespace.comment.leading.js
-  end: (?!\G)
-  patterns:
-   multi:
-    name: comment.line.double-slash.js
-    begin: //
-    bcaps: 0=punctuation.definition.comment.js
-    end: \n
+ single:
+  pattern: \s*((//).*$\n?)
+  caps: 1=comment.line.double-slash.js 2=punctuation.definition.comment.js
  single:
   name: storage.type.js
   pattern: (?<!\.|\$)\b(let|var)\b(?!\$)
