@@ -94,6 +94,13 @@ class JavaScriptIndenter (cfg :Config) extends Indenter.ByBlock(cfg) {
         }
       }
 
+      // HACK: if the block is due to a define(...) { in column zero, don't indent
+      // TODO: make this an option since I'm just working around Andrzej's wacky style
+      if (end.isInstanceOf[BlockS] && line.matches(defineM, 0)) {
+        // hack hack, pop the block and the open paren
+        end = end.next.next
+      }
+
       // if this line is blank or contains only comments; do not mess with our "is continued or
       // not" state; wait until we get to a line with something actually on it
       if (line.synIndexOf(s => !s.isComment, first) == -1) end
@@ -184,4 +191,6 @@ class JavaScriptIndenter (cfg :Config) extends Indenter.ByBlock(cfg) {
   private val elseIfM = Matcher.regexp("""\belse\s+if\b""")
   private val elseM = Matcher.regexp("""\belse\b""")
   private val whileM = Matcher.regexp("""\bwhile\b""")
+
+  private val defineM = Matcher.exact("define(")
 }
