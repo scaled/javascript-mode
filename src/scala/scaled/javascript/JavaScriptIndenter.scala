@@ -11,16 +11,14 @@ class JavaScriptIndenter (cfg :Config) extends Indenter.ByBlock(cfg) {
   import Indenter._
 
   override def computeIndent (state :State, base :Int, info :Info) = {
+    // pop case statements out one indentation level
+    if (info.startsWith(caseColonM)) base - indentWidth;
     // bump extends/with in two indentation levels
-    if (info.startsWith(extendsOrWithM)) base + 2*indentWidth
-    // if we're in a faux case block...
-    else if (state.isInstanceOf[CaseS]) {
-      // ignore the block indent for subsequent case statements
-      if (info.startsWith(caseArrowM)) base - indentWidth
-      // ignore the block indent for the final close bracket
-      else if (info.firstChar == '}') base - 2*indentWidth
-      // otherwise stick to business as usual...
-      else super.computeIndent(state, base, info)
+    else if (info.startsWith(extendsOrWithM)) base + 2*indentWidth
+    // if the line starts with a . align it to the first . on the previous line
+    else if (info.row > 0 && info.firstChar == '.') {
+      val prevDot = info.buffer.line(info.row-1).indexOf('.')
+      if (prevDot >= 0) prevDot else super.computeIndent(state, base, info)
     }
     else super.computeIndent(state, base, info)
   }
@@ -61,12 +59,6 @@ class JavaScriptIndenter (cfg :Config) extends Indenter.ByBlock(cfg) {
         val col = if (line.matches(firstLineDocM, first)) 2 else 1
         new CommentS(col, start)
       }
-      // if this line opens a match case which does not contain any code after the arrow, create a
-      // faux block to indent the case body
-      else if (line.matches(caseArrowM, first) && line.charAt(last) == '>') {
-        // if we're currently in the case block for the preceding case, pop it first
-        new CaseS(start.popIf(_.isInstanceOf[CaseS]))
-      }
       // otherwise leave the start as is
       else start
     }
@@ -106,7 +98,11 @@ class JavaScriptIndenter (cfg :Config) extends Indenter.ByBlock(cfg) {
       if (line.synIndexOf(s => !s.isComment, first) == -1) end
       else {
         // determine (heuristically) whether this line appears to be a complete statement
-        val isContinued = (last >= 0) && contChars.indexOf(line.charAt(last)) >= 0
+        val isContinued = (last >= 0) && (line.charAt(last) match {
+          case '.' | '+' | '-' | '?' | '=' => true
+          case ':' => !line.matches(caseColonM, first)
+          case _ => false
+        })
         val isComplete = !(isContinued || slbExpectsPair ||
                            end.isInstanceOf[BlockS] || end.isInstanceOf[ExprS])
 
@@ -158,6 +154,12 @@ class JavaScriptIndenter (cfg :Config) extends Indenter.ByBlock(cfg) {
     override def show = s"CommentS($inset)"
   }
   protected class ContinuedS (next :State) extends State(next) {
+    override def indent (config :Config, top :Boolean) = {
+      // if we're a continued statement directly inside an expr block, let the expr block dictate
+      // alignment rather than our standard extra indents
+      val n = next
+      if (n.isInstanceOf[ExprS]) n.indent(config, top) else super.indent(config, top)
+    }
     override def show = "ContinuedS"
   }
   protected class CaseS (next :State) extends State(next) {
@@ -181,7 +183,7 @@ class JavaScriptIndenter (cfg :Config) extends Indenter.ByBlock(cfg) {
     override def show = s"SingleBlockS($token, $col)"
   }
 
-  private val caseArrowM = Matcher.regexp("""case\s.*=>""")
+  private val caseColonM = Matcher.regexp("(case\\s|default).*:")
   private val lambdaArrowM = Matcher.exact(" =>")
   private val extendsOrWithM = Matcher.regexp("""(extends|with)\b""")
   private val singleLineBlockM = Matcher.regexp("""(if|else if|else|while)\b""")
