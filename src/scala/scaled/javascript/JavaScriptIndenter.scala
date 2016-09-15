@@ -88,9 +88,13 @@ class JavaScriptIndenter (cfg :Config) extends Indenter.ByBlock(cfg) {
 
       // HACK: if the block is due to a define(...) { in column zero, don't indent
       // TODO: make this an option since I'm just working around Andrzej's wacky style
-      if (end.isInstanceOf[BlockS] && line.matches(defineM, 0)) {
-        // hack hack, pop the block and the open paren
-        end = end.next.next
+      end match {
+        case bend :BlockS =>
+          if (bend.isClose('}') && line.matches(defineM, 0)) {
+            // hack hack, pop the block and the open paren
+            end = end.next.next
+          }
+        case _ => // nevermind!
       }
 
       // if this line is blank or contains only comments; do not mess with our "is continued or
