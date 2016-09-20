@@ -53,7 +53,7 @@ object JavaScriptConfig extends Config.Defs {
     syntaxer("string.quoted.double", Syntax.StringLiteral)
   )
 
-  val grammars = resource(Seq("JavaScript.ndf"))(Grammar.parseNDFs)
+  val grammars = resource(Seq("HTML.ndf", "JavaDoc.ndf", "JavaScript.ndf"))(Grammar.parseNDFs)
 }
 
 @Major(name="javascript",

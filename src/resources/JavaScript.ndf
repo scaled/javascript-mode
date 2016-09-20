@@ -71,6 +71,7 @@ patterns:
    single:
     name: constant.character.escape.js
     pattern: \\(x\h{2}|[0-2][0-7]{0,2}|3[0-6][0-7]|37[0-7]?|[4-7][0-7]?|.)
+ include: text.html.javadoc
  multi:
   name: comment.block.js
   begin: /\*
