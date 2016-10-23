@@ -90,7 +90,7 @@ class JavaScriptIndenter (cfg :Config) extends Indenter.ByBlock(cfg) {
       // TODO: make this an option since I'm just working around Andrzej's wacky style
       end match {
         case bend :BlockS =>
-          if (bend.isClose('}') && line.matches(defineM, 0)) {
+          if (bend.isClose('}') && (line.matches(defineM, 0) || line.matches(bracketM, 0))) {
             // hack hack, pop the block and the open paren
             end = end.next.next
           }
@@ -187,7 +187,7 @@ class JavaScriptIndenter (cfg :Config) extends Indenter.ByBlock(cfg) {
     override def show = s"SingleBlockS($token, $col)"
   }
 
-  private val caseColonM = Matcher.regexp("(case\\s|default).*:")
+  private val caseColonM = Matcher.regexp("(case\\s.*:|default:)")
   private val lambdaArrowM = Matcher.exact(" =>")
   private val extendsOrWithM = Matcher.regexp("""(extends|with)\b""")
   private val singleLineBlockM = Matcher.regexp("""(if|else if|else|while)\b""")
@@ -199,4 +199,5 @@ class JavaScriptIndenter (cfg :Config) extends Indenter.ByBlock(cfg) {
   private val whileM = Matcher.regexp("""\bwhile\b""")
 
   private val defineM = Matcher.exact("define(")
+  private val bracketM = Matcher.exact("], ")
 }
