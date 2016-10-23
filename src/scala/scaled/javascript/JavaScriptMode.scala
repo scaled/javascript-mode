@@ -29,16 +29,16 @@ object JavaScriptConfig extends Config.Defs {
     effacer("entity.name.function", functionStyle),
     effacer("entity.name.val-declaration", variableStyle),
 
-    effacer("support.type", typeStyle),
-
     // effacer("meta.definition.method.javascript", functionStyle),
     effacer("meta.method.javascript", functionStyle),
 
     effacer("storage.modifier.import", moduleStyle),
     effacer("storage.modifier", keywordStyle),
     effacer("storage.type.annotation", preprocessorStyle),
+    effacer("storage.type.other", typeStyle),
     effacer("storage.type.def", keywordStyle),
     effacer("storage.type", keywordStyle),
+    effacer("support.type", typeStyle),
 
     // effacer("variable.import", typeStyle),
     // effacer("variable.language", constantStyle),
