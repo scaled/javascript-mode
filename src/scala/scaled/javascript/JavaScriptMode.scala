@@ -50,7 +50,7 @@ object JavaScriptConfig extends Config.Defs {
     syntaxer("comment.line", Syntax.LineComment),
     syntaxer("comment.block", Syntax.DocComment),
     syntaxer("constant", Syntax.OtherLiteral),
-    syntaxer("string.quoted.double", Syntax.StringLiteral)
+    syntaxer("string", Syntax.StringLiteral)
   )
 
   val grammars = resource(Seq("HTML.ndf", "JavaDoc.ndf", "JavaScript.ndf"))(Grammar.parseNDFs)
