@@ -402,7 +402,7 @@ repository:
    ecaps: 0=string.template.js
    patterns:
     include: #template-substitution-element
-    include: #template-string-conte.js
+    include: #template-string-contents
  template-string-contents:
   multi:
    name: string.template.js
