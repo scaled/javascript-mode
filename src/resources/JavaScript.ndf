@@ -228,7 +228,7 @@ repository:
    name: new.expr.js
    begin: \b(new)\b
    bcaps: 1=keyword.others.js
-   end: (?=[(;]|$)
+   end: (?=[(;}]|$)
    patterns:
     include: #type
     include: #comment
