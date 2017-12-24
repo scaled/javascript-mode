@@ -6,15 +6,16 @@ package scaled.javascript
 
 import scaled._
 import scaled.code.{CodeConfig, Commenter}
-import scaled.grammar.{Grammar, GrammarConfig, GrammarCodeMode}
+import scaled.grammar._
 import scaled.util.Paragrapher
 
-object JavaScriptConfig extends Config.Defs {
+@Plugin(tag="textmate-grammar")
+class JavaScriptGrammarPlugin extends GrammarPlugin {
   import CodeConfig._
-  import GrammarConfig._
 
-  // map TextMate grammar scopes to Scaled style definitions
-  val effacers = List(
+  override def grammars = Map("source.javascript" -> "JavaScript.ndf")
+
+  override def effacers = List(
     effacer("comment.line", commentStyle),
     effacer("comment.block", docStyle),
     effacer("constant", constantStyle),
@@ -45,15 +46,12 @@ object JavaScriptConfig extends Config.Defs {
     effacer("variable", variableStyle)
   )
 
-  // map TextMate grammar scopes to Scaled syntax definitions
-  val syntaxers = List(
+  override def syntaxers = List(
     syntaxer("comment.line", Syntax.LineComment),
     syntaxer("comment.block", Syntax.DocComment),
     syntaxer("constant", Syntax.OtherLiteral),
     syntaxer("string", Syntax.StringLiteral)
   )
-
-  val grammars = resource(Seq("HTML.ndf", "JavaDoc.ndf", "JavaScript.ndf"))(Grammar.parseNDFs)
 }
 
 @Major(name="javascript",
@@ -65,11 +63,7 @@ class JavaScriptMode (env :Env) extends GrammarCodeMode(env) {
   import CodeConfig._
   import scaled.util.Chars._
 
-  override def configDefs = JavaScriptConfig :: super.configDefs
-
-  override def grammars = JavaScriptConfig.grammars.get
-  override def effacers = JavaScriptConfig.effacers
-  override def syntaxers = JavaScriptConfig.syntaxers
+  override def langScope = "source.javascript"
 
   override protected def createIndenter = new JavaScriptIndenter(config)
 
