@@ -2,10 +2,9 @@
 // Scaled JavaScript Mode - a Scaled major mode for editing JavaScript code
 // http://github.com/scaled/scala-mode/blob/master/LICENSE
 
-package scaled.javascript
+package scaled.code
 
 import scaled._
-import scaled.code.{CodeConfig, Commenter}
 import scaled.grammar._
 import scaled.util.Paragrapher
 

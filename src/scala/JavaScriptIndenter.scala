@@ -2,10 +2,9 @@
 // Scaled JavaScript Mode - a Scaled major mode for editing JavaScript code
 // http://github.com/scaled/javascript-mode/blob/master/LICENSE
 
-package scaled.javascript
+package scaled.code
 
 import scaled._
-import scaled.code.Indenter
 
 class JavaScriptIndenter (cfg :Config) extends Indenter.ByBlock(cfg) {
   import Indenter._
