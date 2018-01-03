@@ -24,7 +24,7 @@ object FlowProject {
   class Tag
 }
 
-class FlowProject (ps :ProjectSpace, r :Project.Root) extends AbstractFileProject(ps, r) {
+class FlowProject (ps :ProjectSpace, r :Project.Root) extends Project(ps, r) {
   import FlowProject._
 
   class MetaData (config :PConfig) {
@@ -37,10 +37,6 @@ class FlowProject (ps :ProjectSpace, r :Project.Root) extends AbstractFileProjec
     private def configSL (name :String) = config.resolve(name, PConfig.StringListP)
   }
 
-  // use our ignores when enumerating sources
-  override def onSources (op :Consumer[Path]) :Unit =
-    MoreFiles.onFilteredFiles(sourceDirs, d => !ignore(d), op)
-
   private[this] val meta = new Close.Ref[MetaData](toClose) {
     protected def create = new MetaData(new PConfig(Files.readAllLines(configFile)))
   }
@@ -51,20 +47,26 @@ class FlowProject (ps :ProjectSpace, r :Project.Root) extends AbstractFileProjec
   toClose += metaSvc.service[WatchService].watchFile(configFile, file => reinit())
 
   override protected def computeMeta (oldMeta :Project.Meta) = {
-    val sb = FileProject.stockIgnores
-    meta.get.ignoreNames.foreach { sb += FileProject.ignoreName(_) }
-    meta.get.ignoreRegexes.foreach { sb += FileProject.ignoreRegex(_) }
-    ignores() = sb
+    // add a filer component with custom ignores
+    val igns = Ignorer.stockIgnores
+    meta.get.ignoreNames.foreach { igns += Ignorer.ignoreName(_) }
+    meta.get.ignoreRegexes.foreach { igns += Ignorer.ignoreRegex(_) }
+    addComponent(classOf[Filer], new DirectoryFiler(root.path, exec, igns))
+
+    // add a sources component with our source directories
+    val sourceDirs = meta.get.sourceDirs.map(rootPath.resolve(_)).toSeq;
+    addComponent(classOf[Sources], new Sources(sourceDirs) {
+      // use our ignores when enumerating sources
+      override def onSources (op :Consumer[Path]) :Unit =
+        MoreFiles.onFilteredFiles(sources.dirs, d => igns.exists(_(d)), op)
+    })
 
     addComponent(classOf[Compiler], new FlowCompiler(this) {
       // override def flowOpts = FlowProject.this.flowOpts
       // override protected def willCompile () = copyResources()
     })
 
-    Future.success(oldMeta.copy(
-      name = meta.get.name,
-      sourceDirs = meta.get.sourceDirs.map(rootPath.resolve(_)).toSeq
-    ))
+    Future.success(oldMeta.copy(name = meta.get.name))
   }
 
   override def addToBuffer (buffer :RBuffer) {
