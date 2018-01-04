@@ -12,9 +12,12 @@ import scaled.util.{BufferBuilder, Chars, Errors, SubProcess}
 object FlowCompiler {
   // matches: "/foo/bar/baz.kt:LL: some error message"
   val outputM = Matcher.regexp("""^(?:Error: )?([^:]+):(\d+)$""")
+
+  // used to trigger flow-mode
+  class Tag
 }
 
-abstract class FlowCompiler (proj :Project) extends Compiler(proj) {
+class FlowCompiler (proj :Project) extends Compiler(proj) {
   import Compiler._
   import FlowCompiler._
 
@@ -27,6 +30,11 @@ abstract class FlowCompiler (proj :Project) extends Compiler(proj) {
 
   override def describeOptions (bb :BufferBuilder) {
     bb.addKeyValue("flow: ", if (flowOpts.isEmpty) "<none>" else flowOpts.mkString(" "))
+  }
+
+  override def addToBuffer (buffer :RBuffer) {
+    super.addToBuffer(buffer)
+    buffer.state[Tag]() = new Tag
   }
 
   /** A hook called just before we initiate compilation. */

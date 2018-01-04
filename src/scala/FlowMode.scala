@@ -8,7 +8,7 @@ import scaled._
 import scaled.major.ReadingMode
 import scaled.util.{Errors, Process}
 
-@Minor(name="flow", tags=Array("project"), stateTypes=Array(classOf[FlowProject.Tag]),
+@Minor(name="flow", tags=Array("project"), stateTypes=Array(classOf[FlowCompiler.Tag]),
        desc="""A minor mode that provides Flow-related fns.""")
 class FlowMode (env :Env, major :ReadingMode) extends MinorMode(env) {
 
