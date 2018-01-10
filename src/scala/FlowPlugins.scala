@@ -16,11 +16,9 @@ object FlowPlugins {
 
   @Plugin(tag="project-resolver")
   class FlowResolverPlugin extends ResolverPlugin {
+    override def metaFiles (root :Project.Root) = Seq(root.path.resolve(ConfigFile))
     override def addComponents (project :Project) {
-      val configFile = project.root.path.resolve(ConfigFile)
-      if (Files.exists(configFile)) {
-        project.addComponent(classOf[Compiler], new FlowCompiler(project))
-      }
+      project.addComponent(classOf[Compiler], new FlowCompiler(project))
     }
   }
 }
