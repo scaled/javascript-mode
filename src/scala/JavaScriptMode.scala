@@ -5,6 +5,7 @@
 package scaled.code
 
 import scaled._
+import scaled.Matcher
 import scaled.grammar._
 import scaled.util.Paragrapher
 
@@ -64,7 +65,18 @@ class JavaScriptMode (env :Env) extends GrammarCodeMode(env) {
 
   override def langScope = "source.javascript"
 
-  override protected def createIndenter = new JavaScriptIndenter(config)
+  override protected def createIndenter = new BlockIndenter(config, Seq(
+    // bump extends/implements in two indentation levels
+    BlockIndenter.adjustIndentWhenMatchStart(Matcher.regexp("(extends|implements)\\b"), 2),
+    // align changed method calls under their dot
+    new BlockIndenter.AlignUnderDotRule(),
+    // handle javadoc and block comments
+    new BlockIndenter.BlockCommentRule(),
+    // handle indenting switch statements properly
+    new BlockIndenter.SwitchRule(),
+    // handle continued statements, with some special sauce for : after case
+    new BlockIndenter.CLikeContStmtRule()
+  ));
 
   override val commenter = new Commenter() {
     override def linePrefix  = "//"
