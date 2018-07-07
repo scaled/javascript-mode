@@ -1,0 +1,369 @@
+name: GraphQL
+scopeName: source.graphql
+repository:
+ graphql:
+  include: #graphql-fragment-definition
+  include: #graphql-type-interface
+  include: #graphql-enum
+  include: #graphql-scalar
+  include: #graphql-union
+  include: #graphql-schema
+  include: #graphql-operation-def
+  include: #graphql-comment
+  include: #graphql-directive
+  include: #graphql-blockstring-value
+  include: #graphql-string-value
+ graphql-arguments:
+  multi:
+   name: meta.arguments.graphql
+   begin: \s*(\()
+   bcaps: 1=meta.brace.round.directive.graphql
+   end: \s*(\))
+   ecaps: 1=meta.brace.round.directive.graphql
+   patterns:
+    include: #graphql-comment
+    multi:
+     begin: \s*([_A-Za-z][_0-9A-Za-z]*)(?:\s*(:))?
+     bcaps: 1=variable.arguments.graphql 2=punctuation.colon.graphql
+     end: (?=\s*(?:(?:([_A-Za-z][_0-9A-Za-z]*)\s*(:))|\)))|\s*(,)
+     ecaps: 3=punctuation.comma.graphql
+     patterns:
+      include: #graphql-value
+      include: #graphql-comment
+      include: #graphql-skip-newlines
+ graphql-blockstring-value:
+  multi:
+   begin: \s*(("""))
+   bcaps: 1=string.quoted.block.graphql 2=punctuation.definition.string.begin.graphql
+   end: \s*(?:((""")))
+   ecaps: 1=string.quoted.block.graphql 2=punctuation.definition.string.end.graphql
+   patterns:
+    include: #graphql-string-content
+ graphql-boolean-value:
+  single:
+   pattern: \s*\b(true|false)\b
+   caps: 1=constant.boolean.graphql
+ graphql-colon:
+  single:
+   pattern: \s*(:)
+   caps: 1=punctuation.colon.graphql
+ graphql-comma:
+  single:
+   pattern: \s*(,)
+   caps: 1=punctuation.comma.graphql
+ graphql-comment:
+  single:
+   name: comment.line.graphql.js
+   pattern: (\s*)(#).*
+   caps: 1=punctuation.whitespace.comment.leading.graphql
+ graphql-directive:
+  multi:
+   begin: \s*((@)\s*([_A-Za-z][_0-9A-Za-z]*))
+   bcaps: 1=entity.name.function.directive.graphql
+   end: (?=.)
+   patterns:
+    include: #graphql-arguments
+    include: #graphql-comment
+    include: #graphql-skip-newlines
+ graphql-enum:
+  multi:
+   name: meta.enum.graphql
+   begin: \s*+\b(enum)\b\s*([_A-Za-z][_0-9A-Za-z]*)
+   bcaps: 1=keyword.enum.graphql 2=support.type.enum.graphql
+   end: (?<=})
+   patterns:
+    multi:
+     name: meta.type.object.graphql
+     begin: \s*(\{)
+     bcaps: 1=punctuation.operation.graphql
+     end: \s*(})
+     ecaps: 1=punctuation.operation.graphql
+     patterns:
+      include: #graphql-comment
+      include: #graphql-enum-value
+ graphql-enum-value:
+  single:
+   name: constant.character.enum.graphql
+   pattern: \s*(?!=\b(true|false|null)\b)([_A-Za-z][_0-9A-Za-z]*)
+ graphql-field:
+  single:
+   pattern: \s*([_A-Za-z][_0-9A-Za-z]*)\s*(:)
+   caps: 1=string.unquoted.alias.graphql 2=punctuation.colon.graphql
+  single:
+   pattern: \s*([_A-Za-z][_0-9A-Za-z]*)
+   caps: 1=variable.graphql
+  include: #graphql-arguments
+  include: #graphql-directive
+  include: #graphql-selection-set
+  include: #graphql-skip-newlines
+ graphql-float-value:
+  single:
+   pattern: \s*((-)?(0|([1-9]\d*)(\.\d*)?((e|E)(\+|-)?\d*)?))
+   caps: 1=constant.float.graphql
+ graphql-fragment-definition:
+  multi:
+   name: meta.fragment.graphql
+   begin: \s*(?:(\bfragment\b)\s*(?!\bon\b)([_A-Za-z][_0-9A-Za-z]*)\s*(?:(\bon\b)\s*([_A-Za-z][_0-9A-Za-z]*)))
+   bcaps: 1=keyword.fragment.graphql 2=entity.name.fragment.graphql 3=keyword.on.graphql 4=support.type.graphql
+   end: (?<=})
+   ecaps: 1=keyword.fragment.graphql 2=entity.name.fragment.graphql 3=keyword.on.graphql 4=support.type.graphql
+   patterns:
+    include: #graphql-comment
+    include: #graphql-selection-set
+    include: #graphql-directive
+    include: #graphql-skip-newlines
+ graphql-fragment-spread:
+  multi:
+   begin: \s*(\.\.\.)\s*(?!\bon\b)([_A-Za-z][_0-9A-Za-z]*)
+   bcaps: 1=keyword.operator.spread.graphql 2=variable.fragment.graphql
+   end: (?=.)
+   ecaps: 1=keyword.operator.spread.graphql 2=variable.fragment.graphql
+   patterns:
+    include: #graphql-comment
+    include: #graphql-selection-set
+    include: #graphql-directive
+    include: #graphql-skip-newlines
+ graphql-inline-fragment:
+  multi:
+   begin: \s*(\.\.\.)\s*(?:(\bon\b)\s*([_A-Za-z][_0-9A-Za-z]*))?
+   bcaps: 1=keyword.operator.spread.graphql 2=keyword.on.graphql 3=support.type.graphql
+   end: (?=.)
+   ecaps: 1=keyword.operator.spread.graphql 2=keyword.on.graphql 3=support.type.graphql
+   patterns:
+    include: #graphql-comment
+    include: #graphql-selection-set
+    include: #graphql-directive
+    include: #graphql-skip-newlines
+ graphql-input-types:
+  include: #graphql-scalar-type
+  single:
+   pattern: \s*([_A-Za-z][_0-9A-Za-z]*)(?:\s*(!))?
+   caps: 1=support.type.graphql 2=keyword.operator.nulltype.graphql
+  multi:
+   name: meta.type.list.graphql
+   begin: \s*(\[)
+   bcaps: 1=meta.brace.squart.graphql 2=keyword.operator.nulltype.graphql
+   end: \s*(\])(?:\s*(!))?
+   ecaps: 1=meta.brace.squart.graphql 2=keyword.operator.nulltype.graphql
+   patterns:
+    include: #graphql-input-types
+    include: #graphql-comment
+    include: #graphql-comma
+ graphql-int-value:
+  single:
+   pattern: \s*((-)?(0|[1-9][0-9]*))
+   caps: 1=constant.int.graphql
+ graphql-list-value:
+  multi:
+   name: meta.listvalues.graphql
+   begin: \s*+(\[)
+   bcaps: 1=meta.brace.square.graphql
+   end: \s*(\])
+   ecaps: 1=meta.brace.square.graphql
+   patterns:
+    include: #graphql-value
+ graphql-name:
+  single:
+   pattern: \s*([_A-Za-z][_0-9A-Za-z]*)
+   caps: 1=entity.name.function.graphql
+ graphql-object-field:
+  single:
+   pattern: \s*(([_A-Za-z][_0-9A-Za-z]*))\s*(:)
+   caps: 1=constant.object.key.graphql 2=string.unquoted.graphql 3=punctuation.graphql
+ graphql-object-value:
+  multi:
+   name: meta.objectvalues.graphql
+   begin: \s*+(\{)
+   bcaps: 1=meta.brace.curly.graphql
+   end: \s*(})
+   ecaps: 1=meta.brace.curly.graphql
+   patterns:
+    include: #graphql-object-field
+    include: #graphql-value
+ graphql-operation-def:
+  include: #graphql-query-mutation
+  include: #graphql-name
+  include: #graphql-variable-definitions
+  include: #graphql-directive
+  include: #graphql-selection-set
+ graphql-query-mutation:
+  single:
+   pattern: \s*\b(query|mutation)\b
+   caps: 1=keyword.operation.graphql
+ graphql-scalar:
+  single:
+   pattern: \s*\b(scalar)\b\s*([_A-Za-z][_0-9A-Za-z]*)
+   caps: 1=keyword.scalar.graphql 2=entity.scalar.graphql
+ graphql-scalar-type:
+  single:
+   pattern: \s*\b(Int|Float|String|Boolean|ID)\b(?:\s*(!))?
+   caps: 1=support.type.builtin.graphql 2=keyword.operator.nulltype.graphql
+ graphql-schema:
+  multi:
+   begin: \s*\b(schema)\b
+   bcaps: 1=keyword.schema.graphql
+   end: (?<=})
+   patterns:
+    multi:
+     begin: \s*(\{)
+     bcaps: 1=punctuation.operation.graphql
+     end: \s*(})
+     ecaps: 1=punctuation.operation.graphql
+     patterns:
+      multi:
+       begin: \s*([_A-Za-z][_0-9A-Za-z]*)(?=\s*\(|:)
+       bcaps: 1=variable.arguments.graphql
+       end: (?=\s*(([_A-Za-z][_0-9A-Za-z]*)\s*(\(|:)|(})))|\s*(,)
+       ecaps: 5=punctuation.comma.graphql
+       patterns:
+        single:
+         pattern: \s*([_A-Za-z][_0-9A-Za-z]*)
+         caps: 1=support.type.graphql
+        include: #graphql-colon
+        include: #graphql-comment
+        include: #graphql-directive
+        include: #graphql-skip-newlines
+      include: #graphql-comment
+      include: #graphql-skip-newlines
+    include: #graphql-directive
+    include: #graphql-comment
+    include: #graphql-skip-newlines
+ graphql-selection-set:
+  multi:
+   name: meta.selectionset.graphql
+   begin: \s*(\{)
+   bcaps: 1=punctuation.operation.graphql
+   end: \s*(})
+   ecaps: 1=punctuation.operation.graphql
+   patterns:
+    include: #graphql-field
+    include: #graphql-fragment-spread
+    include: #graphql-inline-fragment
+    include: #graphql-comma
+    include: #graphql-comment
+ graphql-skip-newlines:
+  single:
+   pattern: \s*\
+
+ graphql-string-content:
+  single:
+   name: constant.character.escape.graphql
+   pattern: \\[/'"\\nrtbf]
+  single:
+   name: constant.character.escape.graphql
+   pattern: \\u([0-9a-fA-F]{4})
+ graphql-string-value:
+  multi:
+   begin: \s*+(("))
+   bcaps: 1=string.quoted.double.graphql 2=punctuation.definition.string.begin.graphql
+   end: \s*+(?:(("))|(\
+))
+   ecaps: 1=string.quoted.double.graphql 2=punctuation.definition.string.end.graphql 3=invalid.illegal.newline.graphql
+   patterns:
+    include: #graphql-string-content
+ graphql-type-definition:
+  multi:
+   begin: \s*([_A-Za-z][_0-9A-Za-z]*)(?=\s*(\(|:))
+   bcaps: 1=variable.type.graphql
+   end: (?=\s*(([_A-Za-z][_0-9A-Za-z]*)\s*(\(|:)|(})))|\s*(,)?
+   ecaps: 5=punctuation.comma.graphql
+   patterns:
+    include: #graphql-directive
+    include: #graphql-comment
+    include: #graphql-variable-definitions
+    include: #graphql-type-object
+    include: #graphql-colon
+    include: #graphql-input-types
+ graphql-type-interface:
+  multi:
+   name: meta.type.interface.graphql
+   begin: \s*\b(?:(extends)?\b\s*\b(type)|(interface)|(input))\b\s*([_A-Za-z][_0-9A-Za-z]*)?
+   bcaps: 1=keyword.type.graphql 2=keyword.type.graphql 3=keyword.interface.graphql 4=keyword.input.graphql 5=support.type.graphql
+   end: (?<=})
+   patterns:
+    single:
+     pattern: \s*(?:\b(implements)\b|(&))\s*([_A-Za-z][_0-9A-Za-z]*)
+     caps: 1=keyword.implements.graphql 2=keyword.implements.graphql 3=support.type.graphql
+    include: #graphql-comment
+    include: #graphql-directive
+    include: #graphql-type-object
+ graphql-type-object:
+  multi:
+   name: meta.type.object.graphql
+   begin: \s*(\{)
+   bcaps: 1=punctuation.operation.graphql
+   end: \s*(})
+   ecaps: 1=punctuation.operation.graphql
+   patterns:
+    include: #graphql-comment
+    include: #graphql-type-definition
+ graphql-union:
+  multi:
+   begin: \s*\b(union)\b\s*([_A-Za-z][_0-9A-Za-z]*)
+   bcaps: 1=keyword.union.graphql 2=support.type.graphql
+   end: (?=.)
+   patterns:
+    multi:
+     begin: \s*(=)\s*([_A-Za-z][_0-9A-Za-z]*)
+     bcaps: 1=punctuation.assignment.graphql 2=support.type.graphql
+     end: (?=.)
+     patterns:
+      include: #graphql-skip-newlines
+      include: #graphql-comment
+      single:
+       pattern: \s*(\|)\s*([_A-Za-z][_0-9A-Za-z]*)
+       caps: 1=punctuation.or.graphql 2=support.type.graphql
+    include: #graphql-skip-newlines
+    include: #graphql-comment
+    include: #literal-quasi-embedded
+ graphql-union-mark:
+  single:
+   pattern: \s*(\|)
+   caps: 1=punctuation.union.graphql
+ graphql-value:
+  include: #graphql-variable-name
+  include: #graphql-float-value
+  include: #graphql-int-value
+  include: #graphql-blockstring-value
+  include: #graphql-string-value
+  include: #graphql-boolean-value
+  include: #graphql-enum-value
+  include: #graphql-list-value
+  include: #graphql-object-value
+  include: #graphql-comment
+  include: #literal-quasi-embedded
+ graphql-variable-assignment:
+  multi:
+   begin: \s(=)
+   bcaps: 1=punctuation.assignment.graphql
+   end: (?=.)
+   patterns:
+    include: #graphql-value
+ graphql-variable-definition:
+  multi:
+   name: meta.variables.graphql
+   begin: \s*(\$?[_A-Za-z][_0-9A-Za-z]*)(?=\s*\(|:)
+   bcaps: 1=variable.graphql
+   end: (?=\s*((\$?[_A-Za-z][_0-9A-Za-z]*)\s*(\(|:)|(}|\))))|\s*(,)
+   ecaps: 5=punctuation.comma.graphql
+   patterns:
+    include: #graphql-comment
+    include: #graphql-colon
+    include: #graphql-input-types
+    include: #graphql-variable-assignment
+    include: #graphql-skip-newlines
+ graphql-variable-definitions:
+  multi:
+   begin: \s*(\()
+   bcaps: 1=meta.brace.round.graphql
+   end: \s*(\))
+   ecaps: 1=meta.brace.round.graphql
+   patterns:
+    include: #graphql-comment
+    include: #graphql-variable-definition
+ graphql-variable-name:
+  single:
+   pattern: \s*(\$[_A-Za-z][_0-9A-Za-z]*)
+   caps: 1=variable.graphql
+patterns:
+ include: #graphql
