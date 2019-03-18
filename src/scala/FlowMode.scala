@@ -4,6 +4,7 @@
 
 package scaled.project
 
+import java.nio.file.Paths
 import scaled._
 import scaled.major.ReadingMode
 import scaled.util.{Errors, Process}
@@ -11,6 +12,7 @@ import scaled.util.{Errors, Process}
 @Minor(name="flow", tags=Array("project"), stateTypes=Array(classOf[FlowCompiler.Tag]),
        desc="""A minor mode that provides Flow-related fns.""")
 class FlowMode (env :Env, major :ReadingMode) extends MinorMode(env) {
+  val project = Project(buffer)
 
   override def keymap = super.keymap.
     bind("show-type-at-point", "M-t", "C-c C-d").
@@ -57,7 +59,7 @@ class FlowMode (env :Env, major :ReadingMode) extends MinorMode(env) {
     flow(Seq(cmd) ++ args ++ Seq(s"${p.row+1}", s"${p.col+1}"))
 
   private def flow (args :Seq[String]) :Future[Seq[String]] =
-    Process.exec(editor.exec, Seq("flow") ++ args).map(res => {
+    Process.exec(editor.exec, Seq(Flow.flowBin(project).toString) ++ args).map(res => {
       if (res.exitCode == 0) res.stdout
       else throw Errors.feedback(fail(res, args).mkString("\n"))
     })

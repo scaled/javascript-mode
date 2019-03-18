@@ -19,9 +19,8 @@ class JavaScriptExtractorPlugin extends ExtractorPlugin {
   override val suffs = Set("js")
 
   // TODO: read the beginning of the file and look for @flow annotation?
-  override def extractor (project :Project, suff :String) = flowExtractor(project)
-
-  private def flowExtractor (project :Project) = Some(new FlowExtractor(project.root.path))
+  override def extractor (project :Project, suff :String) = project.component[Flow.FlowBin] map {
+    flow => new FlowExtractor(project.root.path, flow.flow) }
 
   private def tokenExtractor (project :Project) = Some(new TokenExtractor() {
     var rootPath = project.root.path.toString
@@ -43,9 +42,10 @@ class JavaScriptExtractorPlugin extends ExtractorPlugin {
   })
 }
 
-object Flow {
-  def readAST(root :Path, reader :Reader) :JsonObject = {
-    val proc = new ProcessBuilder("flow", "ast").directory(root.toFile()).start()
+object FlowAST {
+
+  def readAST (flow :Path, root :Path, reader :Reader) :JsonObject = {
+    val proc = new ProcessBuilder(flow.toString, "ast").directory(root.toFile()).start()
 
     // read Flow's stderr to check for errors & stdout for the JSON AST
     val (stderrStream, stdoutStream) = (proc.getErrorStream(), proc.getInputStream())
@@ -78,12 +78,12 @@ object Flow {
     Json.parse(stdout.toString()).asObject
   }
 
-  def main(args :Array[String]) {
+  def main (args :Array[String]) {
     val root = Paths.get(System.getProperty("user.dir"))
     val path = Paths.get(args(0))
     val out = new PrintWriter(System.out)
     val source = CharStreams.toString(new FileReader(args(0)))
-    new FlowExtractor(root).process(
+    new FlowExtractor(root, Paths.get("flow")).process(
       new Source.File(path), Files.newBufferedReader(path), new DebugWriter(out, source))
     out.flush()
   }
@@ -113,12 +113,12 @@ class SigBuilder {
   }
 }
 
-class FlowExtractor (root :Path) extends AbstractExtractor {
+class FlowExtractor (root :Path, flow :Path) extends AbstractExtractor {
 
   override def process (source :Source, reader :Reader, writer :Writer) {
     writer.openUnit(source)
     var path = source.relativePath(root.toString)
-    val ast = Flow.readAST(root, reader);
+    val ast = FlowAST.readAST(flow, root, reader);
     val range = ast.asObject.get("range").asArray
     val (start, end) = (range.get(0).asInt, range.get(1).asInt)
     val modRef = Ref.Global.ROOT.plus(path)
