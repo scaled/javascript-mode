@@ -35,7 +35,7 @@ class JavaScriptExtractorPlugin extends ExtractorPlugin {
       writer.emitSig(path);
       modref
     }
-    override def closeUnit (source :Source, writer :Writer) {
+    override def closeUnit (source :Source, writer :Writer) :Unit = {
       writer.closeDef()
       super.closeUnit(source, writer)
     }
@@ -51,7 +51,7 @@ object FlowAST {
     val (stderrStream, stdoutStream) = (proc.getErrorStream(), proc.getInputStream())
     val (stderr, stdout) = (new StringBuffer(), new StringBuffer())
     def mkReader(stream :InputStream, buffer :StringBuffer) = new Thread() {
-      override def run () {
+      override def run () :Unit = {
         CharStreams.copy(new InputStreamReader(stream, "UTF-8"), buffer)
         stream.close()
       }
@@ -78,7 +78,7 @@ object FlowAST {
     Json.parse(stdout.toString()).asObject
   }
 
-  def main (args :Array[String]) {
+  def main (args :Array[String]) :Unit = {
     val root = Paths.get(System.getProperty("user.dir"))
     val path = Paths.get(args(0))
     val out = new PrintWriter(System.out)
@@ -105,7 +105,7 @@ class SigBuilder {
     this
   }
 
-  def emit(writer :Writer) {
+  def emit(writer :Writer) :Unit = {
     writer.emitSig(buffer.toString)
     for ((kind, offset, name) <- uses) {
       writer.emitSigUse(Ref.Global.ROOT.plus(name), kind, offset, name)
@@ -115,7 +115,7 @@ class SigBuilder {
 
 class FlowExtractor (root :Path, flow :Path) extends AbstractExtractor {
 
-  override def process (source :Source, reader :Reader, writer :Writer) {
+  override def process (source :Source, reader :Reader, writer :Writer) :Unit = {
     writer.openUnit(source)
     var path = source.relativePath(root.toString)
     val ast = FlowAST.readAST(flow, root, reader);
@@ -129,17 +129,17 @@ class FlowExtractor (root :Path, flow :Path) extends AbstractExtractor {
     writer.closeUnit()
   }
 
-  def process (ast :JsonObject, ref :Ref.Global, writer :Writer) {
+  def process (ast :JsonObject, ref :Ref.Global, writer :Writer) :Unit = {
     processBody(ast.get("body").asArray, ref, writer)
   }
 
-  def processBody (body :JsonArray, ref :Ref.Global, writer :Writer) {
+  def processBody (body :JsonArray, ref :Ref.Global, writer :Writer) :Unit = {
     for (stmt <- body.values.map(_.asObject)) {
       processStmt(stmt, false, ref, writer)
     }
   }
 
-  def processStmt (stmt :JsonObject, exported :Boolean, ref :Ref.Global, writer :Writer) {
+  def processStmt (stmt :JsonObject, exported :Boolean, ref :Ref.Global, writer :Writer) :Unit = {
     stmt.get("type").asString match {
       case "ExportNamedDeclaration"|"ExportDefaultDeclaration" =>
         val decl = stmt.get("declaration")
@@ -294,7 +294,7 @@ class FlowExtractor (root :Path, flow :Path) extends AbstractExtractor {
     }
   }
 
-  def processExpr (expr :JsonObject, ref :Ref.Global, writer :Writer) {
+  def processExpr (expr :JsonObject, ref :Ref.Global, writer :Writer) :Unit = {
     // TODO
   }
 
@@ -323,7 +323,7 @@ class FlowExtractor (root :Path, flow :Path) extends AbstractExtractor {
     declRef
   }
 
-  def closeDecl (writer :Writer) {
+  def closeDecl (writer :Writer) :Unit = {
     writer.closeDef()
   }
 
@@ -360,7 +360,7 @@ class FlowExtractor (root :Path, flow :Path) extends AbstractExtractor {
     into
   }
 
-  def appendTypeParamsSig(typeParamsVal :JsonValue, into :SigBuilder) {
+  def appendTypeParamsSig(typeParamsVal :JsonValue, into :SigBuilder) :Unit = {
     if (!typeParamsVal.isNull()) {
       into.append("<")
       appendTypeTypeParamsSig(typeParamsVal, into);
@@ -368,7 +368,7 @@ class FlowExtractor (root :Path, flow :Path) extends AbstractExtractor {
     }
   }
 
-  def appendParamsSig(decl :JsonObject, into :SigBuilder) {
+  def appendParamsSig(decl :JsonObject, into :SigBuilder) :Unit = {
     into.append("(")
     val paramsVal = decl.get("params")
     if (!paramsVal.isNull()) {
@@ -381,7 +381,7 @@ class FlowExtractor (root :Path, flow :Path) extends AbstractExtractor {
     into.append(")")
   }
 
-  def appendParamSig(param :JsonObject, into :SigBuilder) {
+  def appendParamSig(param :JsonObject, into :SigBuilder) :Unit = {
     param.get("type").asString match {
       case "Identifier" => appendIdentSig(Kind.VALUE, param, into)
       case "AssignmentPattern" => {
@@ -402,7 +402,7 @@ class FlowExtractor (root :Path, flow :Path) extends AbstractExtractor {
     }
   }
 
-  def appendReturnTypeSig(decl :JsonObject, into :SigBuilder) {
+  def appendReturnTypeSig(decl :JsonObject, into :SigBuilder) :Unit = {
     val returnVal = decl.get("returnType")
     if (!returnVal.isNull()) {
       appendTypeSig(returnVal.asObject, into)
@@ -525,7 +525,7 @@ class FlowExtractor (root :Path, flow :Path) extends AbstractExtractor {
     into
   }
 
-  def appendTypeTypeParamsSig(paramsVal :JsonValue, into :SigBuilder) {
+  def appendTypeTypeParamsSig(paramsVal :JsonValue, into :SigBuilder) :Unit = {
     if (paramsVal != null && !paramsVal.isNull()) {
       if (paramsVal.isArray()) {
         val params = paramsVal.asArray
@@ -543,7 +543,7 @@ class FlowExtractor (root :Path, flow :Path) extends AbstractExtractor {
     }
   }
 
-  def dump(value :JsonValue) {
+  def dump(value :JsonValue) :Unit = {
     println(value.toString(PrettyPrint.indentWithSpaces(2)))
   }
 }

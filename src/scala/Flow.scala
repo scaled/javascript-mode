@@ -17,7 +17,7 @@ object Flow {
 
   /** A component added to a project to indicate that we found a `flow` binary for it. */
   case class FlowBin (flow :Path) extends Project.Component {
-    override def describeSelf (bb :BufferBuilder) {
+    override def describeSelf (bb :BufferBuilder) :Unit = {
       bb.addSection("Flow")
       bb.addKeyValue("Binary", s" $flow")
     }
@@ -30,7 +30,7 @@ object Flow {
   class FlowResolverPlugin extends ResolverPlugin {
     override def metaFiles (root :Project.Root) = Seq(root.path.resolve(NpmConfig))
 
-    override def addComponents (project :Project) {
+    override def addComponents (project :Project) :Unit = {
       // if they have a .flowconfig use flow for type checking
       if (Files.exists(project.root.path.resolve(FlowConfig))) {
         project.addComponent(classOf[Compiler], new FlowCompiler(project))

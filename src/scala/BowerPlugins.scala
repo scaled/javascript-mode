@@ -21,7 +21,7 @@ object BowerPlugins {
 
     override def metaFiles (root :Project.Root) = Seq(root.path.resolve(BowerFile))
 
-    def addComponents (project :Project) {
+    def addComponents (project :Project) :Unit = {
       val rootPath = project.root.path
       val bowerFile = rootPath.resolve(BowerFile)
       val config = Json.parse(Files.newBufferedReader(bowerFile)).asObject

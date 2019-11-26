@@ -28,17 +28,17 @@ class FlowCompiler (proj :Project) extends Compiler(proj) {
 
   override def describeEngine = "flow"
 
-  override def describeOptions (bb :BufferBuilder) {
+  override def describeOptions (bb :BufferBuilder) :Unit = {
     bb.addKeyValue("flow: ", if (flowOpts.isEmpty) "<none>" else flowOpts.mkString(" "))
   }
 
-  override def addToBuffer (buffer :RBuffer) {
+  override def addToBuffer (buffer :RBuffer) :Unit = {
     super.addToBuffer(buffer)
     buffer.state[Tag]() = new Tag
   }
 
   /** A hook called just before we initiate compilation. */
-  protected def willCompile () {}
+  protected def willCompile () :Unit = {}
 
   protected def compile (buffer :Buffer, file :Option[Path]) = {
     // now call down to the project which may copy things back into the output dir
